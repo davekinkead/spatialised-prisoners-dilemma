@@ -1,32 +1,31 @@
-# Models of Segregation
+# Spatialised Prisoner's Dilemma
 
-A reproduction of Thomas Schelling's seminal 1969 work using agent based modelling with coffeescript, D3.js, and HTML. 
+This an agent based simulation of an evolutionary spatialised prisoner's dilemma.
 
-Schelling's paper is about the segregation that can result form discriminatory individual choices. (p488)
+The idea....
 
-His "conjecture is that the interplay of individual choices, where unorganised segregation is concerned, is a complex system with collective results that bear no close relation to individual intent." (p488)
+- agent exist in a space
+- they have a strategy (see below)
+- they interact with all other agents in their neighbourhood
+- they adapt their strategy based on neighbourhood dominance
 
-The only requirement of the model is that the distinctions between agents be twofold, exhaustive and recognisable. (p488)  Certain logical constraints apply to all systems however (p489)
+### Strategies
 
-- both groups can't be numerically superior
-- only complete segregation works if both groups want to be locally superior
-- local majorities are determined by how far the concept of neighbour extends
+Agents can perform one of 8 possible strategies (cooperate or defect) based on the action of other agents.  Read < i, c, d > as < initial action, response to cooperation, response to defection >.
 
-## The Model
+- < 0, 0, 0>	All Defect
+- < 0, 0, 1>	Suspicious Perverse
+- < 0, 1, 0>	Suspicious Tit-for-Tat
+- < 0, 1, 1>	D-then-All-Cooperate
+- < 1, 0, 0>	C-then-All-Defec
+- < 1, 0, 1>	Perverse
+- < 1, 1, 0>	Tit-for-Tat
+- < 1, 1, 1>	All Cooperate
 
-Rather than model a system as Schelling did, we are going to model agents acting independently and observe any emergent system level behaviours.  This means we are going to need agents with:
-
-- satisfaction based on how far one's neighbourhood extends
-- happiness depends on tolerance ratios being satisfied
-- agents move if unhappy
-
-Read through the code for a more detailed explanation of the various parts. The final result can be [viewed here](http://dave.kinkead.com.au/models-of-segregation)
 
 ## Usage
 
 Fork this repo and then just open `index.html` in any browser and the simulation will automatically run.
-
-Alternatively, you can checkout the [demonstration here](http://dave.kinkead.com.au/models-of-segregation)
 
 
 ## Customisation

@@ -30,7 +30,7 @@ info = d3.select("#info").on("click", function() {
 populate = function() {
   return canvas.selectAll("circle").data(simulation.agents(height, width)).enter().append("circle").style("fill", function(d) {
     return d.race;
-  }).style("opacity", 0.5).attr("r", 3).attr("cx", function(d) {
+  }).style("opacity", 0.5).attr("r", 8).attr("cx", function(d) {
     return d.x;
   }).attr("cy", function(d) {
     return d.y;
@@ -69,13 +69,23 @@ Agent = (function() {
     var _ref;
     this.space = space;
     _ref = (function() {
-      switch (Math.floor(Math.random() * 3)) {
+      switch (Math.floor(Math.random() * 8)) {
         case 0:
-          return ["blue", 0.4];
+          return ["indigo", 0.2];
         case 1:
-          return ["red", 0.4];
+          return ["blue	", 0.2];
         case 2:
-          return ["green", 0.4];
+          return ["midnightblue	", 0.2];
+        case 3:
+          return ["green", 0.2];
+        case 4:
+          return ["lime", 0.2];
+        case 5:
+          return ["yellow", 0.2];
+        case 6:
+          return ["orange", 0.2];
+        case 7:
+          return ["crimson	", 0.2];
       }
     })(), this.race = _ref[0], this.xenophobia = _ref[1];
     this.x = Math.floor(Math.random() * this.space.width);

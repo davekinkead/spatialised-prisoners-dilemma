@@ -2,18 +2,21 @@
 
 ## Simulation Code
 
-
-We start with our agents.  Our agents exist in a 2D space, are of a certain race, and hold a xenophobic disposition.  For now, we will randomly assign them their race and geographic location. Their xenophobia will also be a function of their race.
-
-In this case, we will create 3 races of agents and give them a xenophobia level of just 40% (ie agent will only be happy if more than 40% of thier neighbours are the same).
+We start with our agents.  Our agents exist in a 2D space and have a strategy.  For now, we will randomly assign them their strategy and geographic location. 
 
 
 		class Agent
 			constructor: (@space) ->
-				[@race, @xenophobia] = switch Math.floor Math.random() * 3
-									when 0 then ["blue", 0.4]
-									when 1 then ["red", 0.4]
-									when 2 then ["green", 0.4]
+				[@race, @xenophobia] = switch Math.floor Math.random() * 8
+									when 0 then ["indigo", 0.2]
+									when 1 then ["blue	", 0.2]
+									when 2 then ["midnightblue	", 0.2]
+									when 3 then ["green", 0.2]
+									when 4 then ["lime", 0.2]
+									when 5 then ["yellow", 0.2]
+									when 6 then ["orange", 0.2]
+									when 7 then ["crimson	", 0.2]
+		
 				@x = Math.floor Math.random() * @space.width
 				@y = Math.floor Math.random() * @space.height
 				@step 	= @space.width * @space.height / 7200
