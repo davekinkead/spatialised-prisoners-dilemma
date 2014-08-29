@@ -29,7 +29,7 @@ info = d3.select("#info").on("click", function() {
 
 populate = function() {
   return canvas.selectAll("circle").data(simulation.agents(height, width)).enter().append("circle").style("fill", function(d) {
-    return d.race;
+    return d.strategy.color;
   }).style("opacity", 0.5).attr("r", 8).attr("cx", function(d) {
     return d.x;
   }).attr("cy", function(d) {
@@ -43,11 +43,15 @@ move = function() {
   var circles;
   circles = canvas.selectAll("circle");
   return circles.each(function(d) {
-    return d = simulation.move(d);
+    return d = simulation.play(d);
   }).transition().duration(600).attr("cx", function(d) {
     return d.x;
   }).attr("cy", function(d) {
     return d.y;
+  }).attr("r", function(d) {
+    return d.score * 3;
+  }).attr("fill", function(d) {
+    return d.strategy.color;
   });
 };
 
@@ -57,52 +61,91 @@ run = function() {
   }
 };
 
-setInterval(run, 500);
+setInterval(run, 1000);
 
 
 
 },{"./assets/d3.min.js":1,"./simulation.coffee.md":3}],3:[function(require,module,exports){
-var Agent, Space, agents, move;
+var Agent, Space, agents, compete, move, play, prisoners_dilemma;
 
 Agent = (function() {
   function Agent(space) {
-    var _ref;
     this.space = space;
-    _ref = (function() {
+    this.strategy = (function() {
       switch (Math.floor(Math.random() * 8)) {
         case 0:
-          return ["indigo", 0.2];
+          return {
+            name: "All Defect",
+            color: "indigo",
+            i: 0,
+            c: 0,
+            d: 0
+          };
         case 1:
-          return ["blue	", 0.2];
+          return {
+            name: "Suspicious Perverse",
+            color: "blue",
+            i: 0,
+            c: 0,
+            d: 1
+          };
         case 2:
-          return ["midnightblue	", 0.2];
+          return {
+            name: "Suspicious Tit-for-Tat",
+            color: "midnightblue",
+            i: 0,
+            c: 1,
+            d: 0
+          };
         case 3:
-          return ["green", 0.2];
+          return {
+            name: "D-then-All-Cooperate",
+            color: "green",
+            i: 0,
+            c: 1,
+            d: 1
+          };
         case 4:
-          return ["lime", 0.2];
+          return {
+            name: "C-then-All-Defect",
+            color: "lime",
+            i: 1,
+            c: 0,
+            d: 0
+          };
         case 5:
-          return ["yellow", 0.2];
+          return {
+            name: "Perverse",
+            color: "yellow",
+            i: 1,
+            c: 0,
+            d: 1
+          };
         case 6:
-          return ["orange", 0.2];
+          return {
+            name: "Tit-for-Tat",
+            color: "orange",
+            i: 1,
+            c: 1,
+            d: 0
+          };
         case 7:
-          return ["crimson	", 0.2];
+          return {
+            name: "All Cooperate",
+            color: "crimson",
+            i: 1,
+            c: 1,
+            d: 1
+          };
       }
-    })(), this.race = _ref[0], this.xenophobia = _ref[1];
+    })();
     this.x = Math.floor(Math.random() * this.space.width);
     this.y = Math.floor(Math.random() * this.space.height);
-    this.step = this.space.width * this.space.height / 7200;
-    this.depth = this.space.width * this.space.height / 7200;
+    this.step = 10;
+    this.depth = 25;
+    this.last_action = null;
+    this.score = 0;
   }
-
-  Agent.prototype.isHappy = function() {
-    var homogeneity;
-    homogeneity = this.space.homogeneity(this);
-    if (homogeneity >= this.xenophobia) {
-      return true;
-    } else {
-      return false;
-    }
-  };
 
   return Agent;
 
@@ -128,23 +171,6 @@ Space = (function() {
     return neighbours;
   };
 
-  Space.prototype.homogeneity = function(agent) {
-    var neighbour, neighbours, others, same, _i, _len;
-    same = 0;
-    others = 0;
-    neighbours = this.neighbourhood(agent.x, agent.y);
-    for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
-      neighbour = neighbours[_i];
-      if (agent.race === neighbour.race) {
-        same += 1;
-      }
-      if (agent.race !== neighbour.race) {
-        others += 1;
-      }
-    }
-    return same / (same + others);
-  };
-
   return Space;
 
 })();
@@ -160,29 +186,84 @@ agents = function(height, width) {
 
 move = function(agent) {
   var xRand, yRand;
-  if (!agent.isHappy()) {
-    xRand = Math.random() * agent.step;
-    yRand = Math.random() * agent.step;
-    agent.x += xRand - agent.step / 2;
-    if (agent.x < 0) {
-      agent.x = xRand / 2;
-    }
-    if (agent.x > agent.space.width) {
-      agent.x = agent.space.width - xRand / 2;
-    }
-    agent.y += yRand - agent.step / 2;
-    if (agent.y < 0) {
-      agent.y = yRand / 2;
-    }
-    if (agent.y > agent.space.height) {
-      return agent.y = agent.space.height - yRand / 2;
-    }
+  xRand = Math.random() * agent.step;
+  yRand = Math.random() * agent.step;
+  agent.x += xRand - agent.step / 2;
+  if (agent.x < 0) {
+    agent.x = xRand / 2;
+  }
+  if (agent.x > agent.space.width) {
+    agent.x = agent.space.width - xRand / 2;
+  }
+  agent.y += yRand - agent.step / 2;
+  if (agent.y < 0) {
+    agent.y = yRand / 2;
+  }
+  if (agent.y > agent.space.height) {
+    return agent.y = agent.space.height - yRand / 2;
+  }
+};
+
+prisoners_dilemma = function(player1, player2) {
+  if (player1.last_action === 1 && player2.last_action === 1) {
+    return [3, 3];
+  }
+  if (player1.last_action === 1 && player2.last_action === 0) {
+    return [0, 5];
+  }
+  if (player1.last_action === 0 && player2.last_action === 1) {
+    return [5, 0];
+  }
+  if (player1.last_action === 0 && player2.last_action === 0) {
+    return [1, 1];
+  }
+};
+
+play = function(agent) {
+  var neighbour, neighbours, _i, _len, _ref;
+  neighbours = agent.space.neighbourhood(agent.x, agent.y);
+  for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
+    neighbour = neighbours[_i];
+    _ref = compete(agent, neighbour), agent = _ref[0], neighbour = _ref[1];
+    agent.strategy = agent.score > neighbour.score ? agent.strategy : neighbour.strategy;
+  }
+  return agent;
+};
+
+compete = function(agent, neighbour) {
+  var scores;
+  agent.act(neighbour);
+  neighbour.act(agent);
+  scores = prisoners_dilemma(agent, neighbour);
+  agent.score = scores[0];
+  neighbour.score = scores[0];
+  return [agent, neighbour];
+};
+
+Agent.prototype.act = function(neighbour) {
+  return this.last_action = this.last_action != null ? this.respond(neighbour) : this.strategy.i;
+};
+
+Agent.prototype.respond = function(neighbour) {
+  if (neighbour.action === 1) {
+    return this.strategy.c;
+  } else {
+    return this.strategy.d;
+  }
+};
+
+Agent.prototype.action = function() {
+  if (this.last_action != null) {
+    return last_action;
+  } else {
+    return this.strategy.i;
   }
 };
 
 module.exports = {
   agents: agents,
-  move: move
+  move: move,
+  play: play
 };
 
 

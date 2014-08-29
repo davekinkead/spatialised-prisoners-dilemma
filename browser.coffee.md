@@ -14,12 +14,12 @@ Next, we'll grab create our svg canvas, apply some event listeners and add it to
 
 
 		canvas = d3.select("#space")
-								.append("svg:svg")
-								.attr("height", height)
-								.attr("width", width)
-								.on "click", () ->
-									running = false
-									alert 'Simulation stopped'
+					.append("svg:svg")
+					.attr("height", height)
+					.attr("width", width)
+					.on "click", () ->
+						running = false
+						alert 'Simulation stopped'
 
 		info = d3.select("#info")
 					.on "click", () ->
@@ -33,7 +33,7 @@ Now we need to createsvg circles to represent our agents and bind them to the ac
 			canvas.selectAll "circle"
 				.data simulation.agents(height, width)
 				.enter().append "circle"
-				.style "fill", (d) -> d.race 
+				.style "fill", (d) -> d.strategy.color 
 				.style "opacity", 0.5
 				.attr "r", 8
 				.attr "cx", (d) -> d.x
@@ -48,11 +48,14 @@ We then write a loop where each svg circle triggers the move function for its bo
 		move = () ->
 			circles = canvas.selectAll "circle"
 			circles.each (d) ->
-				d = simulation.move d
+				d = simulation.play d
 			.transition()
 			.duration 600
 			.attr "cx", (d) -> d.x
 			.attr "cy", (d) -> d.y
+			.attr "r", (d) -> d.score * 3
+			.attr "fill", (d) -> d.strategy.color
+		
 
 		run = () ->
 			move() unless running is false
@@ -61,4 +64,4 @@ We then write a loop where each svg circle triggers the move function for its bo
 Finally, we run the loop continuous with a half second pause.
 
 
-		setInterval run, 500
+		setInterval run, 1000

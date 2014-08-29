@@ -7,28 +7,24 @@ We start with our agents.  Our agents exist in a 2D space and have a strategy.  
 
 		class Agent
 			constructor: (@space) ->
-				[@race, @xenophobia] = switch Math.floor Math.random() * 8
-									when 0 then ["indigo", 0.2]
-									when 1 then ["blue	", 0.2]
-									when 2 then ["midnightblue	", 0.2]
-									when 3 then ["green", 0.2]
-									when 4 then ["lime", 0.2]
-									when 5 then ["yellow", 0.2]
-									when 6 then ["orange", 0.2]
-									when 7 then ["crimson	", 0.2]
-		
+				@strategy = switch Math.floor Math.random() * 8
+					when 0 then {name: "All Defect", color: "indigo", i: 0, c: 0, d: 0}
+					when 1 then {name: "Suspicious Perverse", color: "blue", i: 0, c: 0, d: 1}
+					when 2 then {name: "Suspicious Tit-for-Tat", color: "midnightblue", i: 0, c: 1, d: 0}
+					when 3 then {name: "D-then-All-Cooperate", color: "green", i: 0, c: 1, d: 1}
+					when 4 then {name: "C-then-All-Defect", color: "lime", i: 1, c: 0, d: 0}
+					when 5 then {name: "Perverse", color: "yellow", i: 1, c: 0, d: 1}
+					when 6 then {name: "Tit-for-Tat", color: "orange", i: 1, c: 1, d: 0}
+					when 7 then {name: "All Cooperate", color: "crimson", i: 1, c: 1, d: 1}
+
 				@x = Math.floor Math.random() * @space.width
 				@y = Math.floor Math.random() * @space.height
-				@step 	= @space.width * @space.height / 7200
-				@depth 	= @space.width * @space.height / 7200
+				@step 	= 10 #@space.width * @space.height / 7200
+				@depth 	= 25
+				@last_action = null
+				@score = 0
 
 
-The happiness of agents is determined by their neighbourhood composition.  If the homogeniality is greater than their xenophobia, then they are happy.  High levels of xenophobia should correlate with greater levels of unhappiness, all other things being equal.
-
-
-			isHappy: () ->
-				homogeneity = @space.homogeneity(this)
-				if homogeneity >= @xenophobia then true else false
 
 
 Next, we difine a 2D space representing the problem domain. Our space contains a geographical distribution of agents stored in a list.  We also give a space a width and height to manage the relation between the simulation and the client.
@@ -50,19 +46,6 @@ In spacial arranements, everybody is next to somebody - their neighbour.  The re
 				neighbours
 
 
-The homogeniality of a neighbourhood relative to an agent is therefore calculated as the proportion of like neighbours to total neighbours.
-
-
-			homogeneity: (agent) ->
-				same = 0
-				others = 0
-				neighbours = this.neighbourhood agent.x, agent.y
-				for neighbour in neighbours
-					same += 1 if agent.race is neighbour.race
-					others += 1 if agent.race isnt neighbour.race
-				same / (same + others)
-
-
 Now that we have defined our model, we need some functions to initiate and control behaviour.  We will instantiate the simulation by invoking the `agents` function.  This will create a space and populate it with agents.
 
 
@@ -77,18 +60,63 @@ We then need some logic for moving our agents around the space.  Movement could 
 
 
 		move = (agent) ->
-			unless agent.isHappy()
-				xRand = Math.random() * agent.step
-				yRand = Math.random() * agent.step
-				agent.x += xRand - agent.step / 2
-				agent.x = xRand / 2 if agent.x < 0
-				agent.x = agent.space.width - xRand /2 if agent.x > agent.space.width
-				agent.y += yRand - agent.step / 2
-				agent.y = yRand /2 if agent.y < 0
-				agent.y = agent.space.height - yRand / 2 if agent.y > agent.space.height
+			xRand = Math.random() * agent.step
+			yRand = Math.random() * agent.step
+			agent.x += xRand - agent.step / 2
+			agent.x = xRand / 2 if agent.x < 0
+			agent.x = agent.space.width - xRand /2 if agent.x > agent.space.width
+			agent.y += yRand - agent.step / 2
+			agent.y = yRand /2 if agent.y < 0
+			agent.y = agent.space.height - yRand / 2 if agent.y > agent.space.height
+
+
+
+		prisoners_dilemma = (player1, player2) ->
+			return [3, 3] if player1.last_action is 1 and player2.last_action is 1
+			return [0, 5] if player1.last_action is 1 and player2.last_action is 0
+			return [5, 0] if player1.last_action is 0 and player2.last_action is 1
+			return [1, 1] if player1.last_action is 0 and player2.last_action is 0
+
+
+Our new API action is play.  The rough idea is to get everybody in the neighbourhood together, compete against each, and update strategy depending on which is the most successful in the neighbourhood.
+
+
+		play = (agent) ->
+			neighbours = agent.space.neighbourhood(agent.x, agent.y)
+			for neighbour in neighbours
+				[agent, neighbour] = compete agent, neighbour
+				agent.strategy = if agent.score > neighbour.score then agent.strategy else neighbour.strategy
+			agent
+
+
+		compete = (agent, neighbour) ->
+			agent.act neighbour
+			neighbour.act agent
+			scores =  prisoners_dilemma agent, neighbour
+			agent.score = scores[0]
+			neighbour.score = scores[0]
+			[agent, neighbour]
+
+
+An agent takes an action based on either their initial action or 
+
+		Agent.prototype.act = (neighbour) ->
+			@last_action = if @last_action? then @respond neighbour else @strategy.i
+
+		Agent.prototype.respond = (neighbour) ->
+			if neighbour.action is 1 then @strategy.c else @strategy.d
+
+		Agent.prototype.action = () ->
+			if @last_action? then last_action else @strategy.i
+
+
+
+
+- interact() 
+- if last_action.nil? then initial_move else coo
 
 
 Finally, we declare our public API so that other modules can access it.
 
 
-		module.exports = {agents: agents, move: move}
+		module.exports = {agents: agents, move: move, play: play}
