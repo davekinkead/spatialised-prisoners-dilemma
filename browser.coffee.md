@@ -54,7 +54,7 @@ We then write a loop where each svg circle triggers the move function for its bo
 			.attr "cx", (d) -> d.x
 			.attr "cy", (d) -> d.y
 			.attr "r", (d) -> d.score * 3
-			.attr "fill", (d) -> d.strategy.color
+			.style "fill", (d) -> d.strategy.color
 		
 
 		run = () ->

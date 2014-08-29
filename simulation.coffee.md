@@ -8,19 +8,19 @@ We start with our agents.  Our agents exist in a 2D space and have a strategy.  
 		class Agent
 			constructor: (@space) ->
 				@strategy = switch Math.floor Math.random() * 8
-					when 0 then {name: "All Defect", color: "indigo", i: 0, c: 0, d: 0}
+					when 0 then {name: "All Defect", color: "red", i: 0, c: 0, d: 0}
 					when 1 then {name: "Suspicious Perverse", color: "blue", i: 0, c: 0, d: 1}
 					when 2 then {name: "Suspicious Tit-for-Tat", color: "midnightblue", i: 0, c: 1, d: 0}
 					when 3 then {name: "D-then-All-Cooperate", color: "green", i: 0, c: 1, d: 1}
 					when 4 then {name: "C-then-All-Defect", color: "lime", i: 1, c: 0, d: 0}
 					when 5 then {name: "Perverse", color: "yellow", i: 1, c: 0, d: 1}
 					when 6 then {name: "Tit-for-Tat", color: "orange", i: 1, c: 1, d: 0}
-					when 7 then {name: "All Cooperate", color: "crimson", i: 1, c: 1, d: 1}
+					when 7 then {name: "All Cooperate", color: "indigo", i: 1, c: 1, d: 1}
 
 				@x = Math.floor Math.random() * @space.width
 				@y = Math.floor Math.random() * @space.height
 				@step 	= 10 #@space.width * @space.height / 7200
-				@depth 	= 25
+				@depth 	= 50
 				@last_action = null
 				@score = 0
 
@@ -83,9 +83,12 @@ Our new API action is play.  The rough idea is to get everybody in the neighbour
 
 		play = (agent) ->
 			neighbours = agent.space.neighbourhood(agent.x, agent.y)
+			others = []
 			for neighbour in neighbours
 				[agent, neighbour] = compete agent, neighbour
-				agent.strategy = if agent.score > neighbour.score then agent.strategy else neighbour.strategy
+				others.push neighbour
+			for neighbour in neighbours
+				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
 			agent
 
 

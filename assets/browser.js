@@ -50,7 +50,7 @@ move = function() {
     return d.y;
   }).attr("r", function(d) {
     return d.score * 3;
-  }).attr("fill", function(d) {
+  }).style("fill", function(d) {
     return d.strategy.color;
   });
 };
@@ -76,7 +76,7 @@ Agent = (function() {
         case 0:
           return {
             name: "All Defect",
-            color: "indigo",
+            color: "red",
             i: 0,
             c: 0,
             d: 0
@@ -132,7 +132,7 @@ Agent = (function() {
         case 7:
           return {
             name: "All Cooperate",
-            color: "crimson",
+            color: "indigo",
             i: 1,
             c: 1,
             d: 1
@@ -142,7 +142,7 @@ Agent = (function() {
     this.x = Math.floor(Math.random() * this.space.width);
     this.y = Math.floor(Math.random() * this.space.height);
     this.step = 10;
-    this.depth = 25;
+    this.depth = 50;
     this.last_action = null;
     this.score = 0;
   }
@@ -220,12 +220,19 @@ prisoners_dilemma = function(player1, player2) {
 };
 
 play = function(agent) {
-  var neighbour, neighbours, _i, _len, _ref;
+  var neighbour, neighbours, others, _i, _j, _len, _len1, _ref;
   neighbours = agent.space.neighbourhood(agent.x, agent.y);
+  others = [];
   for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
     neighbour = neighbours[_i];
     _ref = compete(agent, neighbour), agent = _ref[0], neighbour = _ref[1];
-    agent.strategy = agent.score > neighbour.score ? agent.strategy : neighbour.strategy;
+    others.push(neighbour);
+  }
+  for (_j = 0, _len1 = neighbours.length; _j < _len1; _j++) {
+    neighbour = neighbours[_j];
+    if (!(agent.score >= neighbour.score)) {
+      agent.strategy = neighbour.strategy;
+    }
   }
   return agent;
 };
