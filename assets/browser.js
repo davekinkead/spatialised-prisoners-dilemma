@@ -49,7 +49,7 @@ move = function() {
   }).attr("cy", function(d) {
     return d.y;
   }).attr("r", function(d) {
-    return d.score * 3;
+    return 8;
   }).style("fill", function(d) {
     return d.strategy.color;
   });
@@ -61,88 +61,87 @@ run = function() {
   }
 };
 
-setInterval(run, 1000);
+setInterval(run, 500);
 
 
 
 },{"./assets/d3.min.js":1,"./simulation.coffee.md":3}],3:[function(require,module,exports){
-var Agent, Space, agents, compete, move, play, prisoners_dilemma;
+var Agent, Space, agents, compete, move, play, prisoners_dilemma, strategies;
+
+prisoners_dilemma = function(player1, player2) {
+  if (player1.last_action === 1 && player2.last_action === 1) {
+    return [3, 3];
+  }
+  if (player1.last_action === 1 && player2.last_action === 0) {
+    return [0, 5];
+  }
+  if (player1.last_action === 0 && player2.last_action === 1) {
+    return [5, 0];
+  }
+  if (player1.last_action === 0 && player2.last_action === 0) {
+    return [1, 1];
+  }
+};
+
+strategies = [
+  {
+    i: 0,
+    c: 0,
+    d: 0,
+    name: "ALLD",
+    color: "red"
+  }, {
+    i: 0,
+    c: 0,
+    d: 1,
+    name: "SPRV",
+    color: "orange"
+  }, {
+    i: 0,
+    c: 1,
+    d: 0,
+    name: "ST4T",
+    color: "midnightblue"
+  }, {
+    i: 0,
+    c: 1,
+    d: 1,
+    name: "DTAC",
+    color: "green"
+  }, {
+    i: 1,
+    c: 0,
+    d: 0,
+    name: "CTAD",
+    color: "lime"
+  }, {
+    i: 1,
+    c: 0,
+    d: 1,
+    name: "PERV",
+    color: "yellow"
+  }, {
+    i: 1,
+    c: 1,
+    d: 0,
+    name: "FT4T",
+    color: "blue"
+  }, {
+    i: 1,
+    c: 1,
+    d: 1,
+    name: "ALLC",
+    color: "indigo"
+  }
+];
 
 Agent = (function() {
   function Agent(space) {
     this.space = space;
-    this.strategy = (function() {
-      switch (Math.floor(Math.random() * 8)) {
-        case 0:
-          return {
-            name: "All Defect",
-            color: "red",
-            i: 0,
-            c: 0,
-            d: 0
-          };
-        case 1:
-          return {
-            name: "Suspicious Perverse",
-            color: "blue",
-            i: 0,
-            c: 0,
-            d: 1
-          };
-        case 2:
-          return {
-            name: "Suspicious Tit-for-Tat",
-            color: "midnightblue",
-            i: 0,
-            c: 1,
-            d: 0
-          };
-        case 3:
-          return {
-            name: "D-then-All-Cooperate",
-            color: "green",
-            i: 0,
-            c: 1,
-            d: 1
-          };
-        case 4:
-          return {
-            name: "C-then-All-Defect",
-            color: "lime",
-            i: 1,
-            c: 0,
-            d: 0
-          };
-        case 5:
-          return {
-            name: "Perverse",
-            color: "yellow",
-            i: 1,
-            c: 0,
-            d: 1
-          };
-        case 6:
-          return {
-            name: "Tit-for-Tat",
-            color: "orange",
-            i: 1,
-            c: 1,
-            d: 0
-          };
-        case 7:
-          return {
-            name: "All Cooperate",
-            color: "indigo",
-            i: 1,
-            c: 1,
-            d: 1
-          };
-      }
-    })();
+    this.strategy = strategies[Math.floor(Math.random() * 8)];
     this.x = Math.floor(Math.random() * this.space.width);
     this.y = Math.floor(Math.random() * this.space.height);
-    this.step = 10;
-    this.depth = 50;
+    this.step = 15;
     this.last_action = null;
     this.score = 0;
   }
@@ -156,6 +155,7 @@ Space = (function() {
     this.height = height;
     this.width = width;
     this.agents = [];
+    this.depth = 50;
   }
 
   Space.prototype.neighbourhood = function(x, y) {
@@ -164,7 +164,7 @@ Space = (function() {
     _ref = this.agents;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       other = _ref[_i];
-      if ((x - other.depth < (_ref1 = other.x) && _ref1 < x + other.depth) && (y - other.depth < (_ref2 = other.y) && _ref2 < y + other.depth)) {
+      if ((x - other.space.depth < (_ref1 = other.x) && _ref1 < x + other.space.depth) && (y - other.space.depth < (_ref2 = other.y) && _ref2 < y + other.space.depth)) {
         neighbours.push(other);
       }
     }
@@ -175,13 +175,51 @@ Space = (function() {
 
 })();
 
-agents = function(height, width) {
-  var n, space, _i;
-  space = new Space(height, width);
-  for (n = _i = 1; _i <= 2000; n = ++_i) {
-    space.agents.push(new Agent(space));
+play = function(agent) {
+  var neighbour, neighbours, _i, _j, _len, _len1;
+  neighbours = agent.space.neighbourhood(agent.x, agent.y);
+  for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
+    neighbour = neighbours[_i];
+    agent = compete(agent, neighbour);
   }
-  return space.agents;
+  for (_j = 0, _len1 = neighbours.length; _j < _len1; _j++) {
+    neighbour = neighbours[_j];
+    if (!(agent.score >= neighbour.score)) {
+      agent.strategy = neighbour.strategy;
+    }
+  }
+  move(agent);
+  return agent;
+};
+
+compete = function(agent, neighbour) {
+  var scores;
+  agent.act(neighbour);
+  neighbour.act(agent);
+  scores = prisoners_dilemma(agent, neighbour);
+  agent.score += scores[0];
+  neighbour.score += scores[0];
+  return agent;
+};
+
+Agent.prototype.act = function(neighbour) {
+  return this.last_action = this.last_action != null ? this.respond(neighbour) : this.strategy.i;
+};
+
+Agent.prototype.respond = function(neighbour) {
+  if (neighbour.action === 1) {
+    return this.strategy.c;
+  } else {
+    return this.strategy.d;
+  }
+};
+
+Agent.prototype.action = function() {
+  if (this.last_action != null) {
+    return last_action;
+  } else {
+    return this.strategy.i;
+  }
 };
 
 move = function(agent) {
@@ -204,67 +242,13 @@ move = function(agent) {
   }
 };
 
-prisoners_dilemma = function(player1, player2) {
-  if (player1.last_action === 1 && player2.last_action === 1) {
-    return [3, 3];
+agents = function(height, width) {
+  var n, space, _i;
+  space = new Space(height, width);
+  for (n = _i = 1; _i <= 2000; n = ++_i) {
+    space.agents.push(new Agent(space));
   }
-  if (player1.last_action === 1 && player2.last_action === 0) {
-    return [0, 5];
-  }
-  if (player1.last_action === 0 && player2.last_action === 1) {
-    return [5, 0];
-  }
-  if (player1.last_action === 0 && player2.last_action === 0) {
-    return [1, 1];
-  }
-};
-
-play = function(agent) {
-  var neighbour, neighbours, others, _i, _j, _len, _len1, _ref;
-  neighbours = agent.space.neighbourhood(agent.x, agent.y);
-  others = [];
-  for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
-    neighbour = neighbours[_i];
-    _ref = compete(agent, neighbour), agent = _ref[0], neighbour = _ref[1];
-    others.push(neighbour);
-  }
-  for (_j = 0, _len1 = neighbours.length; _j < _len1; _j++) {
-    neighbour = neighbours[_j];
-    if (!(agent.score >= neighbour.score)) {
-      agent.strategy = neighbour.strategy;
-    }
-  }
-  return agent;
-};
-
-compete = function(agent, neighbour) {
-  var scores;
-  agent.act(neighbour);
-  neighbour.act(agent);
-  scores = prisoners_dilemma(agent, neighbour);
-  agent.score = scores[0];
-  neighbour.score = scores[0];
-  return [agent, neighbour];
-};
-
-Agent.prototype.act = function(neighbour) {
-  return this.last_action = this.last_action != null ? this.respond(neighbour) : this.strategy.i;
-};
-
-Agent.prototype.respond = function(neighbour) {
-  if (neighbour.action === 1) {
-    return this.strategy.c;
-  } else {
-    return this.strategy.d;
-  }
-};
-
-Agent.prototype.action = function() {
-  if (this.last_action != null) {
-    return last_action;
-  } else {
-    return this.strategy.i;
-  }
+  return space.agents;
 };
 
 module.exports = {

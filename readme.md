@@ -2,9 +2,9 @@
 
 This an agent based simulation of an evolutionary spatialised prisoner's dilemma.
 
-The idea....
+The idea is that:
 
-- agent exist in a space
+- agents exist in a space
 - they have a strategy (see below)
 - they interact with all other agents in their neighbourhood
 - they adapt their strategy based on neighbourhood dominance
@@ -21,6 +21,8 @@ Agents can perform one of 8 possible strategies (cooperate or defect) based on t
 - < 1, 0, 1>	Perverse
 - < 1, 1, 0>	Tit-for-Tat
 - < 1, 1, 1>	All Cooperate
+
+Follow a more details explaination of the process in the [simulation code](simulation.coffee.md).
 
 
 ## Usage
