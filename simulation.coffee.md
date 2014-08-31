@@ -3,7 +3,7 @@
 ## Simulation Code
 
 
-First, let's define some aspects of a Prisoner's Dilemma.  A PD is a two (or more) player symmertic non-cooperative non-zero sum game that has payoffers for each player based on the behaviour of other players.  We will create a generic function that returns a tuple representing conditional player outcomes.
+First, let's define some aspects of a Prisoner's Dilemma.  A PD is a two (or more) player symmertic non-cooperative non-zero sum game that has payoffs for each player based on the behaviour of other players.  We will create a generic function that returns a tuple representing conditional player outcomes.
 
 
 		prisoners_dilemma = (player1, player2) ->
@@ -19,7 +19,7 @@ There are 8 possible deterministic single round strategies a player could employ
 		strategies = [
 			{ i: 0, c: 0, d: 0, name: "ALLD", color: "red" },
 			{ i: 0, c: 0, d: 1, name: "SPRV", color: "orange" },
-			{ i: 0, c: 1, d: 0, name: "ST4T", color: "midnightblue" },
+			{ i: 0, c: 1, d: 0, name: "ST4T", color: "violet" },
 			{ i: 0, c: 1, d: 1, name: "DTAC", color: "green" },
 			{ i: 1, c: 0, d: 0, name: "CTAD", color: "lime" },
 			{ i: 1, c: 0, d: 1, name: "PERV", color: "yellow" },
@@ -28,7 +28,7 @@ There are 8 possible deterministic single round strategies a player could employ
 		]
 
 
-Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_ation to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location. 
+#Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
 
 
 		class Agent
@@ -48,7 +48,7 @@ Agents live in a space. We difine a 2D space representing the problem domain. Ou
 		class Space
 			constructor: (@height, @width) ->
 				@agents = []
-				@depth 	= 50
+				@depth = 50
 
 
 In spacial arranements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
@@ -68,22 +68,24 @@ Now we turn to our game.  For every agent, we get all their neighbours, the play
 		play = (agent) ->
 			neighbours = agent.space.neighbourhood(agent.x, agent.y)
 			for neighbour in neighbours
-				agent = compete agent, neighbour	
+				agent = compete agent, neighbour
 			for neighbour in neighbours
 				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
-			move agent		
+			move agent
 			agent
 
 
-While an agent plays against everyone in their neighbourhood, a game applies between just two agent.  Here, we get an agent to act against her neighbour, and update their scores based on the strategy employed.
+While an agent plays against everyone in their neighbourhood, a game applies between just two agents.  Here, we get an agent to act against her neighbour, and update their scores based on the strategy employed. We play the prisoner's dilemma 200 times for each neighbour.
 
 
 		compete = (agent, neighbour) ->
 			agent.act neighbour
 			neighbour.act agent
-			scores =  prisoners_dilemma agent, neighbour
+			scores = []
+			for n in [n..200]
+				scores = prisoners_dilemma agent, neighbour
 			agent.score += scores[0]
-			neighbour.score += scores[0]
+			neighbour.score += scores[1]
 			agent
 
 
@@ -119,7 +121,7 @@ Now that we have defined our model, we need some functions to initiate and contr
 		agents = (height, width) ->
 			space = new Space(height, width)
 			for n in [1..2000]
-				space.agents.push new Agent space 
+				space.agents.push new Agent space
 			space.agents
 
 
