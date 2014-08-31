@@ -28,7 +28,7 @@ There are 8 possible deterministic single round strategies a player could employ
 		]
 
 
-#Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
+Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
 
 
 		class Agent
