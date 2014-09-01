@@ -13,9 +13,9 @@ simulation = require('./simulation.coffee.md');
 
 running = true;
 
-height = window.innerHeight || 600;
+height = 500;
 
-width = window.innerWidth || 600;
+width = 500;
 
 canvas = d3.select("#space").append("svg:svg").attr("height", height).attr("width", width).on("click", function() {
   running = false;
@@ -188,20 +188,23 @@ play = function(agent) {
       agent.strategy = neighbour.strategy;
     }
   }
-  move(agent);
   return agent;
 };
 
 compete = function(agent, neighbour) {
-  var n, scores, _i;
+  var agent_total, n, neighbour_total, scores, _i;
   agent.act(neighbour);
   neighbour.act(agent);
   scores = [];
-  for (n = _i = n; n <= 200 ? _i <= 200 : _i >= 200; n = n <= 200 ? ++_i : --_i) {
+  agent_total = 0;
+  neighbour_total = 0;
+  for (n = _i = 0; _i <= 200; n = ++_i) {
     scores = prisoners_dilemma(agent, neighbour);
+    agent_total += scores[0];
+    neighbour_total += scores[1];
   }
-  agent.score += scores[0];
-  neighbour.score += scores[1];
+  agent.score = agent_total;
+  neighbour.score = neighbour_total;
   return agent;
 };
 
@@ -248,7 +251,7 @@ move = function(agent) {
 agents = function(height, width) {
   var n, space, _i;
   space = new Space(height, width);
-  for (n = _i = 1; _i <= 2000; n = ++_i) {
+  for (n = _i = 1; _i <= 500; n = ++_i) {
     space.agents.push(new Agent(space));
   }
   return space.agents;
