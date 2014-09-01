@@ -19,12 +19,12 @@ There are 8 possible deterministic single round strategies a player could employ
 		strategies = [
 			{ i: 0, c: 0, d: 0, name: "ALLD", color: "red" },
 			{ i: 0, c: 0, d: 1, name: "SPRV", color: "orange" },
-			{ i: 0, c: 1, d: 0, name: "ST4T", color: "violet" },
+			{ i: 0, c: 1, d: 0, name: "ST4T", color: "yellow" },
 			{ i: 0, c: 1, d: 1, name: "DTAC", color: "green" },
-			{ i: 1, c: 0, d: 0, name: "CTAD", color: "lime" },
-			{ i: 1, c: 0, d: 1, name: "PERV", color: "yellow" },
-			{ i: 1, c: 1, d: 0, name: "FT4T", color: "blue" },
-			{ i: 1, c: 1, d: 1, name: "ALLC", color: "indigo" }
+			{ i: 1, c: 0, d: 0, name: "CTAD", color: "blue" },
+			{ i: 1, c: 0, d: 1, name: "PERV", color: "indigo" },
+			{ i: 1, c: 1, d: 0, name: "FT4T", color: "violet" },
+			{ i: 1, c: 1, d: 1, name: "ALLC", color: "purple" }
 		]
 
 

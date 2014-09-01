@@ -101,7 +101,7 @@ strategies = [
     c: 1,
     d: 0,
     name: "ST4T",
-    color: "midnightblue"
+    color: "yellow"
   }, {
     i: 0,
     c: 1,
@@ -113,25 +113,25 @@ strategies = [
     c: 0,
     d: 0,
     name: "CTAD",
-    color: "lime"
+    color: "blue"
   }, {
     i: 1,
     c: 0,
     d: 1,
     name: "PERV",
-    color: "yellow"
+    color: "indigo"
   }, {
     i: 1,
     c: 1,
     d: 0,
     name: "FT4T",
-    color: "blue"
+    color: "violet"
   }, {
     i: 1,
     c: 1,
     d: 1,
     name: "ALLC",
-    color: "indigo"
+    color: "purple"
   }
 ];
 
@@ -193,12 +193,15 @@ play = function(agent) {
 };
 
 compete = function(agent, neighbour) {
-  var scores;
+  var n, scores, _i;
   agent.act(neighbour);
   neighbour.act(agent);
-  scores = prisoners_dilemma(agent, neighbour);
+  scores = [];
+  for (n = _i = n; n <= 200 ? _i <= 200 : _i >= 200; n = n <= 200 ? ++_i : --_i) {
+    scores = prisoners_dilemma(agent, neighbour);
+  }
   agent.score += scores[0];
-  neighbour.score += scores[0];
+  neighbour.score += scores[1];
   return agent;
 };
 
