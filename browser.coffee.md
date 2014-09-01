@@ -67,4 +67,10 @@ We then write a loop where each svg circle triggers the move function for its bo
 
 Finally, we run the loop continuous with a half second pause.
 
+<<<<<<< HEAD
 		setInterval run, 500
+=======
+	
+		
+		setInterval run, 500
+>>>>>>> upstream/master

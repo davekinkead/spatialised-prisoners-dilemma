@@ -72,6 +72,7 @@ Now we turn to our game.  For every agent, we get all their neighbours, the play
 				agent = compete agent, neighbour
 			for neighbour in neighbours
 				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
+
 			move agent
 			agent
 
@@ -82,9 +83,12 @@ While an agent plays against everyone in their neighbourhood, a game applies bet
 		compete = (agent, neighbour) ->
 			agent.act neighbour
 			neighbour.act agent
+<<<<<<< HEAD
 			scores = []
 			agent_total = 0
 			neighbour_total = 0
+=======
+>>>>>>> upstream/master
 			for n in [0..20]
 				scores = prisoners_dilemma agent, neighbour
 				agent.score += scores[0]
