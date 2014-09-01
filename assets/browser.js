@@ -50,6 +50,8 @@ move = function() {
     return d.y;
   }).attr("r", function(d) {
     return 8;
+  }).attr("title", function(d) {
+    return "" + d.strategy.name + " - " + d.score;
   }).style("fill", function(d) {
     return d.strategy.color;
   });
@@ -95,43 +97,63 @@ strategies = [
     c: 0,
     d: 1,
     name: "SPRV",
-    color: "orange"
+    color: "green"
   }, {
     i: 0,
     c: 1,
     d: 0,
     name: "ST4T",
+<<<<<<< HEAD
     color: "yellow"
+=======
+    color: "blue"
+>>>>>>> upstream/master
   }, {
     i: 0,
     c: 1,
     d: 1,
     name: "DTAC",
-    color: "green"
+    color: "indigo"
   }, {
     i: 1,
     c: 0,
     d: 0,
     name: "CTAD",
+<<<<<<< HEAD
     color: "blue"
+=======
+    color: "yellow"
+>>>>>>> upstream/master
   }, {
     i: 1,
     c: 0,
     d: 1,
     name: "PERV",
+<<<<<<< HEAD
     color: "indigo"
+=======
+    color: "lime"
+>>>>>>> upstream/master
   }, {
     i: 1,
     c: 1,
     d: 0,
     name: "FT4T",
+<<<<<<< HEAD
     color: "violet"
+=======
+    color: "skyblue"
+>>>>>>> upstream/master
   }, {
     i: 1,
     c: 1,
     d: 1,
     name: "ALLC",
+<<<<<<< HEAD
     color: "purple"
+=======
+    color: "violet"
+>>>>>>> upstream/master
   }
 ];
 
@@ -155,7 +177,7 @@ Space = (function() {
     this.height = height;
     this.width = width;
     this.agents = [];
-    this.depth = 50;
+    this.depth = 25;
   }
 
   Space.prototype.neighbourhood = function(x, y) {
@@ -177,6 +199,7 @@ Space = (function() {
 
 play = function(agent) {
   var neighbour, neighbours, _i, _j, _len, _len1;
+  agent.score = 0;
   neighbours = agent.space.neighbourhood(agent.x, agent.y);
   for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
     neighbour = neighbours[_i];
@@ -192,6 +215,7 @@ play = function(agent) {
 };
 
 compete = function(agent, neighbour) {
+<<<<<<< HEAD
   var agent_total, n, neighbour_total, scores, _i;
   agent.act(neighbour);
   neighbour.act(agent);
@@ -205,6 +229,15 @@ compete = function(agent, neighbour) {
   }
   agent.score = agent_total;
   neighbour.score = neighbour_total;
+=======
+  var n, scores, _i;
+  agent.act(neighbour);
+  neighbour.act(agent);
+  for (n = _i = 0; _i <= 20; n = ++_i) {
+    scores = prisoners_dilemma(agent, neighbour);
+    agent.score += scores[0];
+  }
+>>>>>>> upstream/master
   return agent;
 };
 

@@ -57,6 +57,7 @@ We then write a loop where each svg circle triggers the move function for its bo
 			.attr "cx", (d) -> d.x
 			.attr "cy", (d) -> d.y
 			.attr "r", (d) -> 8
+			.attr "title", (d) -> "#{d.strategy.name} - #{d.score}"
 			.style "fill", (d) -> d.strategy.color
 		
 
@@ -65,6 +66,5 @@ We then write a loop where each svg circle triggers the move function for its bo
 
 
 Finally, we run the loop continuous with a half second pause.
-
 
 		setInterval run, 500

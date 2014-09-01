@@ -18,13 +18,13 @@ There are 8 possible deterministic single round strategies a player could employ
 
 		strategies = [
 			{ i: 0, c: 0, d: 0, name: "ALLD", color: "red" },
-			{ i: 0, c: 0, d: 1, name: "SPRV", color: "orange" },
-			{ i: 0, c: 1, d: 0, name: "ST4T", color: "yellow" },
-			{ i: 0, c: 1, d: 1, name: "DTAC", color: "green" },
-			{ i: 1, c: 0, d: 0, name: "CTAD", color: "blue" },
-			{ i: 1, c: 0, d: 1, name: "PERV", color: "indigo" },
-			{ i: 1, c: 1, d: 0, name: "FT4T", color: "violet" },
-			{ i: 1, c: 1, d: 1, name: "ALLC", color: "purple" }
+			{ i: 0, c: 0, d: 1, name: "SPRV", color: "green" },
+			{ i: 0, c: 1, d: 0, name: "ST4T", color: "blue" },
+			{ i: 0, c: 1, d: 1, name: "DTAC", color: "indigo" },
+			{ i: 1, c: 0, d: 0, name: "CTAD", color: "yellow" },
+			{ i: 1, c: 0, d: 1, name: "PERV", color: "lime" },
+			{ i: 1, c: 1, d: 0, name: "FT4T", color: "skyblue" },
+			{ i: 1, c: 1, d: 1, name: "ALLC", color: "violet" }
 		]
 
 
@@ -48,7 +48,7 @@ Agents live in a space. We difine a 2D space representing the problem domain. Ou
 		class Space
 			constructor: (@height, @width) ->
 				@agents = []
-				@depth = 50
+				@depth = 25
 
 
 In spacial arranements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
@@ -66,16 +66,17 @@ Now we turn to our game.  For every agent, we get all their neighbours, the play
 
 
 		play = (agent) ->
+			agent.score = 0
 			neighbours = agent.space.neighbourhood(agent.x, agent.y)
 			for neighbour in neighbours
 				agent = compete agent, neighbour
 			for neighbour in neighbours
 				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
-			#move agent
+			move agent
 			agent
 
 
-While an agent plays against everyone in their neighbourhood, a game applies between just two agents.  Here, we get an agent to act against her neighbour, and update their scores based on the strategy employed. We play the prisoner's dilemma 200 times for each neighbour.
+While an agent plays against everyone in their neighbourhood, a game applies between just two agents.  Here, we get an agent to act against her neighbour, and update their scores based on the strategy employed. We play the prisoner's dilemma n times for each neighbour.
 
 
 		compete = (agent, neighbour) ->
@@ -84,14 +85,9 @@ While an agent plays against everyone in their neighbourhood, a game applies bet
 			scores = []
 			agent_total = 0
 			neighbour_total = 0
-			for n in [0..200]
+			for n in [0..20]
 				scores = prisoners_dilemma agent, neighbour
-				agent_total += scores[0]
-				neighbour_total += scores[1]
-			#agent.score += scores[0]
-			agent.score = agent_total
-			#neighbour.score += scores[1]
-			neighbour.score = neighbour_total
+				agent.score += scores[0]
 			agent
 
 
