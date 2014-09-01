@@ -50,6 +50,8 @@ move = function() {
     return d.y;
   }).attr("r", function(d) {
     return 8;
+  }).attr("title", function(d) {
+    return "" + d.strategy.name + " - " + d.score;
   }).style("fill", function(d) {
     return d.strategy.color;
   });
@@ -95,43 +97,43 @@ strategies = [
     c: 0,
     d: 1,
     name: "SPRV",
-    color: "orange"
+    color: "green"
   }, {
     i: 0,
     c: 1,
     d: 0,
     name: "ST4T",
-    color: "midnightblue"
+    color: "blue"
   }, {
     i: 0,
     c: 1,
     d: 1,
     name: "DTAC",
-    color: "green"
+    color: "indigo"
   }, {
     i: 1,
     c: 0,
     d: 0,
     name: "CTAD",
-    color: "lime"
+    color: "yellow"
   }, {
     i: 1,
     c: 0,
     d: 1,
     name: "PERV",
-    color: "yellow"
+    color: "lime"
   }, {
     i: 1,
     c: 1,
     d: 0,
     name: "FT4T",
-    color: "blue"
+    color: "skyblue"
   }, {
     i: 1,
     c: 1,
     d: 1,
     name: "ALLC",
-    color: "indigo"
+    color: "violet"
   }
 ];
 
@@ -155,7 +157,7 @@ Space = (function() {
     this.height = height;
     this.width = width;
     this.agents = [];
-    this.depth = 50;
+    this.depth = 25;
   }
 
   Space.prototype.neighbourhood = function(x, y) {
@@ -177,6 +179,7 @@ Space = (function() {
 
 play = function(agent) {
   var neighbour, neighbours, _i, _j, _len, _len1;
+  agent.score = 0;
   neighbours = agent.space.neighbourhood(agent.x, agent.y);
   for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
     neighbour = neighbours[_i];
@@ -193,12 +196,13 @@ play = function(agent) {
 };
 
 compete = function(agent, neighbour) {
-  var scores;
+  var n, scores, _i;
   agent.act(neighbour);
   neighbour.act(agent);
-  scores = prisoners_dilemma(agent, neighbour);
-  agent.score += scores[0];
-  neighbour.score += scores[0];
+  for (n = _i = 0; _i <= 20; n = ++_i) {
+    scores = prisoners_dilemma(agent, neighbour);
+    agent.score += scores[0];
+  }
   return agent;
 };
 
