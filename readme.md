@@ -24,6 +24,7 @@ Agents can perform one of 8 possible strategies (cooperate or defect) based on t
 
 Follow a more details explaination of the process in the [simulation code](simulation.coffee.md).
 
+Provides that friendly-tit-for-tat can get an adequate beachhead, it will always dominate the simulation (although occasional pockets of all-cooperation survive tit-for-tat).  Interestingly, a little random walk (of only 5 pixels) is needed for this to happen.  Without it, tit-for-tat can't establish a deep enough beachhead in the highly random assignment of initial positions.
 
 ## Usage
 
