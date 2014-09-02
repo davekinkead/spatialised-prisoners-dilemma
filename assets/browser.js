@@ -44,6 +44,8 @@ move = function() {
   circles = canvas.selectAll("circle");
   return circles.each(function(d) {
     return d = simulation.play(d);
+  }).each(function(d) {
+    return d = simulation.update(d);
   }).transition().duration(600).attr("cx", function(d) {
     return d.x;
   }).attr("cy", function(d) {
@@ -63,12 +65,12 @@ run = function() {
   }
 };
 
-setInterval(run, 500);
+setInterval(run, 1000);
 
 
 
 },{"./assets/d3.min.js":1,"./simulation.coffee.md":3}],3:[function(require,module,exports){
-var Agent, Space, agents, compete, move, play, prisoners_dilemma, strategies;
+var Agent, Space, agents, compete, move, play, prisoners_dilemma, strategies, update;
 
 prisoners_dilemma = function(player1, player2) {
   if (player1.last_action === 1 && player2.last_action === 1) {
@@ -138,9 +140,12 @@ strategies = [
 ];
 
 Agent = (function() {
-  function Agent(space) {
+  function Agent(space, strategy) {
     this.space = space;
-    this.strategy = strategies[Math.floor(Math.random() * 8)];
+    this.strategy = strategy;
+    if (this.strategies != null) {
+      this.strategy = strategies[Math.floor(Math.random() * 8)];
+    }
     this.x = Math.floor(Math.random() * this.space.width);
     this.y = Math.floor(Math.random() * this.space.height);
     this.step = 15;
@@ -153,12 +158,58 @@ Agent = (function() {
 })();
 
 Space = (function() {
-  function Space(height, width) {
+  function Space(height, width, agents) {
     this.height = height;
     this.width = width;
     this.agents = [];
     this.depth = 25;
+    this.populate(agents);
   }
+
+  Space.prototype.populate = function(blueprint) {
+    var i, n, type, v, _i, _len, _results;
+    type = 0;
+    _results = [];
+    for (v = _i = 0, _len = blueprint.length; _i < _len; v = ++_i) {
+      i = blueprint[v];
+      _results.push((function() {
+        var _j, _results1;
+        _results1 = [];
+        for (n = _j = 0; 0 <= i ? _j <= i : _j >= i; n = 0 <= i ? ++_j : --_j) {
+          _results1.push(this.agents.push(new Agent(this, strategies[v])));
+        }
+        return _results1;
+      }).call(this));
+    }
+    return _results;
+  };
+
+  Space.prototype.cluster = function(where, what) {
+    var agent, block, hurdle, i, j, position, x, y, _i, _j, _len, _ref, _ref1, _ref2;
+    for (i = _i = _ref = this.agents.length - 1; _ref <= 1 ? _i <= 1 : _i >= 1; i = _ref <= 1 ? ++_i : --_i) {
+      if (!(what > Math.random())) {
+        j = Math.floor(Math.random() * (i + 1));
+        _ref1 = [this.agents[j], this.agents[i]], this.agents[i] = _ref1[0], this.agents[j] = _ref1[1];
+      }
+    }
+    block = Math.sqrt(this.width * this.height / this.agents.length);
+    x = y = block / 2;
+    _ref2 = this.agents;
+    for (position = _j = 0, _len = _ref2.length; _j < _len; position = ++_j) {
+      agent = _ref2[position];
+      hurdle = Math.random();
+      agent.x = where > hurdle ? x : Math.floor(Math.random() * this.width);
+      agent.y = where > hurdle ? y : Math.floor(Math.random() * this.height);
+      if (x < this.width) {
+        x += block;
+      }
+      if (x > this.width) {
+        y += block;
+        x = block / 2;
+      }
+    }
+    return this.agents;
+  };
 
   Space.prototype.neighbourhood = function(x, y) {
     var neighbours, other, _i, _len, _ref, _ref1, _ref2;
@@ -178,20 +229,13 @@ Space = (function() {
 })();
 
 play = function(agent) {
-  var neighbour, neighbours, _i, _j, _len, _len1;
+  var neighbour, neighbours, _i, _len;
   agent.score = 0;
   neighbours = agent.space.neighbourhood(agent.x, agent.y);
   for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
     neighbour = neighbours[_i];
     agent = compete(agent, neighbour);
   }
-  for (_j = 0, _len1 = neighbours.length; _j < _len1; _j++) {
-    neighbour = neighbours[_j];
-    if (!(agent.score >= neighbour.score)) {
-      agent.strategy = neighbour.strategy;
-    }
-  }
-  move(agent);
   return agent;
 };
 
@@ -199,10 +243,33 @@ compete = function(agent, neighbour) {
   var n, scores, _i;
   agent.act(neighbour);
   neighbour.act(agent);
-  for (n = _i = 0; _i <= 20; n = ++_i) {
+  for (n = _i = 0; _i <= 50; n = ++_i) {
     scores = prisoners_dilemma(agent, neighbour);
     agent.score += scores[0];
   }
+  return agent;
+};
+
+update = function(agent) {
+  var max, neighbour, neighbours, winners;
+  neighbours = agent.space.neighbourhood(agent.x, agent.y);
+  max = neighbours.reduce(function(a, b) {
+    return {
+      score: Math.max(a.score, b.score)
+    };
+  });
+  winners = (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = neighbours.length; _i < _len; _i++) {
+      neighbour = neighbours[_i];
+      if (neighbour.score === max.score) {
+        _results.push(neighbour);
+      }
+    }
+    return _results;
+  })();
+  agent.strategy = winners[Math.floor(Math.random() * winners.length)].strategy;
   return agent;
 };
 
@@ -247,18 +314,16 @@ move = function(agent) {
 };
 
 agents = function(height, width) {
-  var n, space, _i;
-  space = new Space(height, width);
-  for (n = _i = 1; _i <= 2000; n = ++_i) {
-    space.agents.push(new Agent(space));
-  }
-  return space.agents;
+  var space;
+  space = new Space(height, width, [250, 250, 250, 250, 250, 250, 250, 250]);
+  return space.cluster(1.0, 0.0);
 };
 
 module.exports = {
   agents: agents,
   move: move,
-  play: play
+  play: play,
+  update: update
 };
 
 

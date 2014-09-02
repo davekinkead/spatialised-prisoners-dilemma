@@ -28,12 +28,12 @@ There are 8 possible deterministic single round strategies a player could employ
 		]
 
 
-#Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
+Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
 
 
 		class Agent
-			constructor: (@space) ->
-				@strategy = strategies[Math.floor Math.random() * 8]
+			constructor: (@space, @strategy) ->
+				@strategy = strategies[Math.floor Math.random() * 8] if @strategies?
 				@x = Math.floor Math.random() * @space.width
 				@y = Math.floor Math.random() * @space.height
 				@step = 15
@@ -46,9 +46,45 @@ Agents live in a space. We difine a 2D space representing the problem domain. Ou
 
 
 		class Space
-			constructor: (@height, @width) ->
+			constructor: (@height, @width, agents) ->
 				@agents = []
 				@depth = 25
+				@populate agents
+
+
+We add agents to a space by populating it.  We give this function a blueprint outlineing how many of each strategy to give it such as [250, 250]
+
+
+			populate: (blueprint) ->
+				type = 0
+				for i,v in blueprint
+					for n in [0..i]
+						@agents.push new Agent this, strategies[v]
+
+
+Agents can be arranged in a space either deterministically or stochastically, and this arrangement can relate to either where they are or what they are.  The cluster method accepts 2 arguments between `0.0` and `1.0` relating the degree of determinism concerning where is located and what the agent is.
+
+
+			cluster: (where, what) ->
+				# what - a modified Fisher-Yates shuffle
+				for i in [@agents.length-1..1]
+					unless what > Math.random()
+						j = Math.floor Math.random() * (i + 1)
+						[@agents[i], @agents[j]] = [@agents[j], @agents[i]]
+
+				# where
+				block = Math.sqrt @width * @height / @agents.length
+				x = y = block / 2
+				for agent, position in @agents
+					hurdle = Math.random()
+					agent.x = if where > hurdle then x else Math.floor Math.random() * @width
+					agent.y = if where > hurdle then y else Math.floor Math.random() * @height
+					x += block if x < @width
+					if x > @width 
+						y += block
+						x = block / 2
+				@agents
+
 
 
 In spacial arranements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
@@ -70,10 +106,7 @@ Now we turn to our game.  For every agent, we get all their neighbours, the play
 			neighbours = agent.space.neighbourhood(agent.x, agent.y)
 			for neighbour in neighbours
 				agent = compete agent, neighbour
-			for neighbour in neighbours
-				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
-
-			move agent
+			#move agent
 			agent
 
 
@@ -83,11 +116,23 @@ While an agent plays against everyone in their neighbourhood, a game applies bet
 		compete = (agent, neighbour) ->
 			agent.act neighbour
 			neighbour.act agent
-			for n in [0..20]
+			for n in [0..50]
 				scores = prisoners_dilemma agent, neighbour
 				agent.score += scores[0]
 			agent
 
+
+Agents also need to update their strategy after each round.
+
+
+		update = (agent) ->
+			neighbours = agent.space.neighbourhood(agent.x, agent.y)
+			max = neighbours.reduce (a, b) -> {score: Math.max a.score, b.score}
+			winners = (neighbour for neighbour in neighbours when neighbour.score is max.score)
+			agent.strategy = winners[Math.floor Math.random() * winners.length].strategy 
+			agent
+
+			
 
 We now need to extend the functionality of the Agent class.  In a game, an agent takes an action based on either their initial action if it's their first, or the responce to the other players cooperation or defection.
 
@@ -119,16 +164,14 @@ Now that we have defined our model, we need some functions to initiate and contr
 
 
 		agents = (height, width) ->
-			space = new Space(height, width)
-			for n in [1..2000]
-				space.agents.push new Agent space
-			space.agents
+			space = new Space(height, width, [250, 250, 250, 250, 250, 250, 250, 250])
+			space.cluster 1.0, 0.0
 
 
 Finally, we declare our public API so that other modules can access it.
 
 
-		module.exports = {agents: agents, move: move, play: play}
+		module.exports = {agents: agents, move: move, play: play, update: update}
 
 
 That's it. Simulation complete!

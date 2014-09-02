@@ -49,6 +49,8 @@ We then write a loop where each svg circle triggers the move function for its bo
 			circles = canvas.selectAll "circle"
 			circles.each (d) ->
 				d = simulation.play d
+			.each (d) ->
+				d = simulation.update d
 			.transition()
 			.duration 600
 			.attr "cx", (d) -> d.x
@@ -66,4 +68,4 @@ Finally, we run the loop continuous with a half second pause.
 
 	
 		
-		setInterval run, 500
+		setInterval run, 1000
