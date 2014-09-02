@@ -32,10 +32,12 @@ Next we model our agents.  Our agents exist in a 2D space and have a strategy, a
 
 
 		class Agent
-			constructor: (@space) ->
+			constructor: (@space, @xpos, @ypos) ->
 				@strategy = strategies[Math.floor Math.random() * 8]
-				@x = Math.floor Math.random() * @space.width
-				@y = Math.floor Math.random() * @space.height
+				#@x = Math.floor Math.random() * @space.width
+				#@y = Math.floor Math.random() * @space.height
+				@x = xpos
+				@y = ypos
 				@step = 15
 				@last_action = null
 				@score = 0
@@ -51,7 +53,7 @@ Agents live in a space. We difine a 2D space representing the problem domain. Ou
 				@depth = 25
 
 
-In spacial arranements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
+In spacial arrangements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
 
 
 			neighbourhood: (x, y) ->
@@ -72,8 +74,7 @@ Now we turn to our game.  For every agent, we get all their neighbours, the play
 				agent = compete agent, neighbour
 			for neighbour in neighbours
 				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
-
-			move agent
+			#move agent
 			agent
 
 
@@ -83,12 +84,9 @@ While an agent plays against everyone in their neighbourhood, a game applies bet
 		compete = (agent, neighbour) ->
 			agent.act neighbour
 			neighbour.act agent
-<<<<<<< HEAD
 			scores = []
 			agent_total = 0
 			neighbour_total = 0
-=======
->>>>>>> upstream/master
 			for n in [0..20]
 				scores = prisoners_dilemma agent, neighbour
 				agent.score += scores[0]
@@ -126,8 +124,11 @@ Now that we have defined our model, we need some functions to initiate and contr
 
 		agents = (height, width) ->
 			space = new Space(height, width)
-			for n in [1..500]
-				space.agents.push new Agent space
+			height_spacing = height / 16
+			width_spacing = width / 16
+			for m in [1..16]
+				for n in [1..16]
+					space.agents.push new Agent space, (m * 25), (n * 25) 
 			space.agents
 
 

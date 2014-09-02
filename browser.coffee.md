@@ -6,10 +6,10 @@ This is the browser file where we pull together different parts of the simulatio
 		d3 = require './assets/d3.min.js'
 		simulation = require './simulation.coffee.md'
 		running = true
-		#height = window.innerHeight || 600
-		#width = window.innerWidth || 600
-		height = 500
-		width = 500
+		height = window.innerHeight || 600
+		width = window.innerWidth || 600
+		#height = 500
+		#width = 500
 
 
 Next, we'll grab create our svg canvas, apply some event listeners and add it to the DOM.
@@ -67,10 +67,4 @@ We then write a loop where each svg circle triggers the move function for its bo
 
 Finally, we run the loop continuous with a half second pause.
 
-<<<<<<< HEAD
 		setInterval run, 500
-=======
-	
-		
-		setInterval run, 500
->>>>>>> upstream/master
