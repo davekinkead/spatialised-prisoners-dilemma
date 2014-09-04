@@ -15,6 +15,28 @@ First up, let's define some payoff matrixes for various games.  A Prisoner's Dil
 			payoffs[game.toString()]
 
 
+We can use this function as a basis for variants on the Prisoner's Dilemma that have different payoffs for cooperation and defection. The first is the Stag Hunt. In this variant, cooperation by both players gets them the greater reward (in this case, a nice stag dinner that requires the cooperation of both hunters to catch). If either player defects and chases after a rabbit instead, no-one gets a stag dinner, but the defector gains a rabbit while the cooperator gets nothing. If both hunters go for rabbits, everyone gets a rabbit dinner, but wistfully think about how many they would have prefer to have deer on their plate instead.
+
+		stag_hunt = (game) ->
+			payoffs = {
+				"1,1": [2,2],
+				"1,0": [0,1],
+				"0,1": [1,0],
+				"0,0": [1,1],
+			}
+			payoffs[game.toString()]
+
+Another variant of the Prisoner's Dilemma is the Snow Drift. In this case, the players represent people on opposite slides of a snow drift that covers a road. If both players dig in, they clear the road and are back on their respective ways, although both are tried from the efforts of digging. If only one player digs, the road is still cleared, but the defector hasn't had to make the effort to do so. If no-one digs out the snow drift, both players are stuck where they are.
+
+		snow_drift = (game) ->
+			payoffs = {
+				"1,1": [2,2],
+				"1,0": [1,3],
+				"0,1": [3,1],
+				"0,0": [0,0],
+			}
+			payoffs[game.toString()]
+
 There are 8 possible deterministic single round strategies a player could employ in any 2 player game.  These are specified by their inital move `i`, responding to cooperation move `c`, and responding to defection move `d`.  We'll also name these and give them pretty colours and store them in a list.
 
 
@@ -30,22 +52,6 @@ There are 8 possible deterministic single round strategies a player could employ
 		]
 
 
-#<<<<<<< HEAD
-#Next we model our agents.  Our agents exist in a 2D space and have a strategy, a score, and a last_action to keep track of behavior and performance.  For now, we will randomly assign them their strategy and geographic location.
-
-
-#		class AgentD
-#			constructor: (@space, @xpos, @ypos) ->
-#				@strategy = strategies[Math.floor Math.random() * 8]
-				#@x = Math.floor Math.random() * @space.width
-				#@y = Math.floor Math.random() * @space.height
-#				@x = xpos
-#				@y = ypos
-#				@step = 15
-#				@last_action = null
-#				@score = 0
-
-#=======
 Next we model our agents.  These agents exist in a space hold a game strategy which is assigned randomly if none is provided.  We also give them a step length in case they will be walking.
 
 
@@ -53,7 +59,6 @@ Next we model our agents.  These agents exist in a space hold a game strategy wh
 			constructor: (@space, @strategy) ->
 				@strategy = strategies[Math.floor Math.random() * 8] if @strategies?
 				@step = 10
-#>>>>>>> upstream/master
 
 
 Agents live in a space which we define as a 2D space representing the problem domain.  When we crate a space, we populate it with agents, and give it a neighbourhood depth value.
@@ -122,20 +127,12 @@ Now we turn to our game.  The browser will trigger the main game interface `cont
 			rounds = 10
 			neighbours = agent.space.neighbourhood(agent.x, agent.y)
 			for neighbour in neighbours
-#<<<<<<< HEAD
-#				agent = compete agent, neighbour
-#			for neighbour in neighbours
-#				agent.strategy = neighbour.strategy unless agent.score >= neighbour.score
-			#move agent
-#=======
 				for round in [0..rounds]
 					last_game = [agent.play(neighbour, last_game), neighbour.play(agent, last_game)]
 					scores = prisoners_dilemma last_game
 					agent.score += scores[0]
 			walk agent
-#>>>>>>> upstream/master
 			agent
-			
 
 We also need to define the interaction between agents.  The initial move is dictated by the agent's strategy while subsequent moves are based on an opponents last move.
 
@@ -143,21 +140,8 @@ We also need to define the interaction between agents.  The initial move is dict
 		Agent.prototype.play =  (neighbour, last_game) ->
 			if last_game.length is 0 then @strategy.i else @next_move last_game
 
-#<<<<<<< HEAD
-#		compete = (agent, neighbour) ->
-#			agent.act neighbour
-#			neighbour.act agent
-#			scores = []
-#			agent_total = 0
-#			neighbour_total = 0
-#			for n in [0..20]
-#				scores = prisoners_dilemma agent, neighbour
-#				agent.score += scores[0]
-#			agent
-#=======
 		Agent.prototype.next_move = (last_game) ->
 			if last_game[1] is 1 then @strategy.c else @strategy.d
-#>>>>>>> upstream/master
 
 
 Agents also need to update their strategy after each round.  We will do this only after all contests in a tick have finished and scores have been calculated.
@@ -190,18 +174,8 @@ Now that we have defined our model, we need some functions to initiate and contr
 
 
 		agents = (height, width) ->
-#<<<<<<< HEAD
-#			space = new Space(height, width)
-#			height_spacing = height / 16
-#			width_spacing = width / 16
-#			for m in [1..16]
-#				for n in [1..16]
-#					space.agents.push new Agent space, (m * 25), (n * 25) 
-#			space.agents
-#=======
 			space = new Space(height, width, [250, 250, 250, 250, 250, 250, 250, 250])
 			space.cluster 1.0, 0.0
-#>>>>>>> upstream/master
 
 
 Finally, we declare our public API so that other modules can access it.
