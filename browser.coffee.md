@@ -8,6 +8,8 @@ This is the browser file where we pull together different parts of the simulatio
 		running = true
 		height = window.innerHeight || 600
 		width = window.innerWidth || 600
+		#height = 500
+		#width = 500
 
 
 Next, we'll grab create our svg canvas, apply some event listeners and add it to the DOM.
@@ -25,6 +27,7 @@ Next, we'll grab create our svg canvas, apply some event listeners and add it to
 					.on "click", () ->
 						d3.select("#info p").style "display", "none"
 						d3.select("#info h1").style "font-size", "1em"
+
 
 Now we need to createsvg circles to represent our agents and bind them to the actual agents from the simulation.  The `d` in the functions here is the D3js accessor to the agent data.
 
@@ -69,3 +72,4 @@ Finally, we run the loop continuous with a half second pause.
 	
 		#run()
 		setInterval run, 500
+

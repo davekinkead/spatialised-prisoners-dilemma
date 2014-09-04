@@ -2,7 +2,7 @@
 
 ## Simulation Code
 
-First up, lets define some payoff matrixes for various games.  A Prisoner's Dilemma is a two (or more) player symmertic non-cooperative non-zero sum game that has payoffs for each player based on the behaviour of other players.  We will create a generic function that returns a tuple representing conditional player outcomes, based on a tuple of player actions eg `[1,0]` for player 1 cooperate & player 2 defect.
+First up, let's define some payoff matrixes for various games.  A Prisoner's Dilemma is a two (or more) player symmertic non-cooperative non-zero sum game that has payoffs for each player based on the behaviour of other players.  We will create a generic function that returns a tuple representing conditional player outcomes, based on a tuple of player actions eg `[1,0]` for player 1 cooperate & player 2 defect.
 
 
 		prisoners_dilemma = (game) ->
@@ -14,6 +14,28 @@ First up, lets define some payoff matrixes for various games.  A Prisoner's Dile
 			}
 			payoffs[game.toString()]
 
+
+We can use this function as a basis for variants on the Prisoner's Dilemma that have different payoffs for cooperation and defection. The first is the Stag Hunt. In this variant, cooperation by both players gets them the greater reward (in this case, a nice stag dinner that requires the cooperation of both hunters to catch). If either player defects and chases after a rabbit instead, no-one gets a stag dinner, but the defector gains a rabbit while the cooperator gets nothing. If both hunters go for rabbits, everyone gets a rabbit dinner, but wistfully think about how many they would have prefer to have deer on their plate instead.
+
+		stag_hunt = (game) ->
+			payoffs = {
+				"1,1": [2,2],
+				"1,0": [0,1],
+				"0,1": [1,0],
+				"0,0": [1,1],
+			}
+			payoffs[game.toString()]
+
+Another variant of the Prisoner's Dilemma is the Snow Drift. In this case, the players represent people on opposite slides of a snow drift that covers a road. If both players dig in, they clear the road and are back on their respective ways, although both are tried from the efforts of digging. If only one player digs, the road is still cleared, but the defector hasn't had to make the effort to do so. If no-one digs out the snow drift, both players are stuck where they are.
+
+		snow_drift = (game) ->
+			payoffs = {
+				"1,1": [2,2],
+				"1,0": [1,3],
+				"0,1": [3,1],
+				"0,0": [0,0],
+			}
+			payoffs[game.toString()]
 
 There are 8 possible deterministic single round strategies a player could employ in any 2 player game.  These are specified by their inital move `i`, responding to cooperation move `c`, and responding to defection move `d`.  We'll also name these and give them pretty colours and store them in a list.
 
@@ -84,7 +106,7 @@ The what-algorithm is a modified Fisher-Yates shuffle that is applied stochastic
 			@agents
 
 
-In spacial arranements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
+In spacial arrangements, everybody is next to somebody - their neighbour.  A neighbourhood is simply a list of all the agents within an agent's depth perception.  Here we return everyone within a square from an x, y coordinate.
 
 
 		Space.prototype.neighbourhood = (x, y) ->
@@ -111,7 +133,6 @@ Now we turn to our game.  The browser will trigger the main game interface `cont
 					agent.score += scores[0]
 			walk agent
 			agent
-			
 
 We also need to define the interaction between agents.  The initial move is dictated by the agent's strategy while subsequent moves are based on an opponents last move.
 

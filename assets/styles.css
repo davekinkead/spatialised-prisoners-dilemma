@@ -10,10 +10,18 @@ html { font-size: 28px; font-family: 'Lato', sans-serif; }
 	opacity: 0.9; 
 }
 
-h1 { text-transform: uppercase; font-size: 300%; line-height: 1em; margin-bottom: 1em; font-weight: 900; overflow: hidden;}
-p { background: #DFDFDF; opacity: 0.8; padding: 0.5em 0.25em; }
+H1 { TEXT-TRANSFORM: UPPERCASE; FONT-SIZE: 300%; LINE-HEIGHT: 1EM; MARGIN-BOTTOM: 1EM; FONT-WEIGHT: 900; OVERFLOW: HIDDEN;}
+P { BACKGROUND: #DFDFDF; OPACITY: 0.8; PADDING: 0.5EM 0.25EM; }
 
 #space { margin: 0 auto; background: #FFF; }
 
-footer { position: absolute; right: 15px; bottom: 15px; text-align: right; color: #666; font-size: 0.8em; }
-footer a { color: #333; }
+FOOTER { POSITION: ABSOLUTE; RIGHT: 15PX; BOTTOM: 15PX; TEXT-ALIGN: RIGHT; COLOR: #666; FONT-SIZE: 0.8EM; }
+FOOTER A { COLOR: #333; }
+
+#legend {
+    margin: auto;
+    position: absolute; left: 15px; bottom: 150px; text-align: left; 
+    color: #333;
+    opacity: 0.9;
+    font-size: 0.5em;
+}
