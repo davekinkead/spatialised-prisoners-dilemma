@@ -8,16 +8,34 @@
 </head>
 <body>
   <div id="info">
-	  <h1>Spatialised Prisoner's Dilemma</h1>
-	  <p>An agent based simulation of an evolutionary spatialised prisoner's dilemma. Agents adapt the best performing strategy from their neighbourhood each round.</p>
+    <h1>Spatialised Prisoner's Dilemma</h1>
+    <p>This is an agent based simulation of an spatialised evolutionary prisoner's dilemma.  A prisoner's dilemma is a game where players can either cooperate or defect with each other.  </p>
+
+    <p>Each action has a payoff based on the other player's action and there are 8 possible deterministic strategies given an initial move, a response to cooperation, and a response to defection.</p>
+    <ul>
+      <li>Always Defect - red</li>
+      <li>Suspicious Opposite - purple</li>
+      <li>Suspicious Tit-for-Tat - indigo</li>
+      <li>Defect, then Cooperate - lime</li>
+      <li>Cooperate, then Defect - orange</li>
+      <li>Friendly Opposite - pink</li>
+      <li>Friendly Tit-for-Tat - blue</li>
+      <li>Always Cooperate - green</li>
+    </ul>
+
+    <p>For every tick of the simulation, agents plays 10 rounds of a prisoner's dilemma with others in their neighbourhood.  At the end of 10 rounds, agents adapt the best performing strategy from their neighbourhood.</p>
+
+    <p>The simulation shows that while defection is initially successful, friendly tit-for-tat will dominate the simulation when ever a cooperative cluster develops.</p>
+
+    <p>Click on the simulation to <a href="#space">start / stop</a> it.  Detailed explanation and code is available on github.</p>
   </div>
   <div id="space">
   </div>
   <footer>
-  	Simulation by <a href="http://dave.kinkead.com.au">Dave Kinkead</a>
+    copyright 2014 <a href="http://dave.kinkead.com.au">Dave Kinkead</a> | content licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a> | code under <a href="http://opensource.org/licenses/MIT">MIT.</a>
   </footer>
 
-  <a href="https://github.com/davekinkead/spatialised-prisoners-dilemma"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+  <a href="https://github.com/davekinkead/models-of-segregation"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
   
   <!-- This should be the last element of the html -->
   <script type="text/javascript" src="assets/browser.js"></script>
